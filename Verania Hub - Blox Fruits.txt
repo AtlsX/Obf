@@ -2845,13 +2845,91 @@ function CheckItemBPCRBPCR(name)
     end
 end
 
+local player = game.Players.LocalPlayer
+local function IsEntityAlive(entity)
+    if not entity then return false end
+    local humanoid = entity:FindFirstChild("Humanoid")
+    return humanoid and humanoid.Health > 0
+end
+local function GetEnemiesInRange(character, range)
+    local enemies = game:GetService("Workspace").Enemies:GetChildren()
+    local players = game:GetService("Players"):GetPlayers()
+    local targets = {}
+    local playerPos = character:GetPivot().Position
+    for _, enemy in ipairs(enemies) do
+        local rootPart = enemy:FindFirstChild("HumanoidRootPart")
+        if rootPart and IsEntityAlive(enemy) then
+            local distance = (rootPart.Position - playerPos).Magnitude
+            if distance <= range then
+                table.insert(targets, enemy)
+            end
+        end
+    end
+    for _, otherPlayer in ipairs(players) do
+        if otherPlayer ~= player and otherPlayer.Character then
+            local rootPart = otherPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if rootPart and IsEntityAlive(otherPlayer.Character) then
+                local distance = (rootPart.Position - playerPos).Magnitude
+                if distance <= range then
+                    table.insert(targets, otherPlayer.Character)
+                end
+            end
+        end
+    end
+    return targets
+end
+function AttackNoCoolDown()
+    local character = player.Character
+    if not character then return end
+    local equippedWeapon
+    for _, item in ipairs(character:GetChildren()) do
+        if item:IsA("Tool") then
+            equippedWeapon = item
+            break
+        end
+    end
+    if not equippedWeapon then return end
+    local enemiesInRange = GetEnemiesInRange(character, 60)
+    if equippedWeapon:FindFirstChild("LeftClickRemote") then
+        local attackCount = 1  
+        for _, enemy in ipairs(enemiesInRange) do
+            local rootPart = enemy:FindFirstChild("HumanoidRootPart")
+            if rootPart then
+                local direction = (rootPart.Position - character:GetPivot().Position).Unit
+                equippedWeapon.LeftClickRemote:FireServer(direction, attackCount)
+                attackCount = attackCount + 1
+            end
+        end
+    else
+        local targets, mainTarget = {}, nil
+        for _, enemy in ipairs(enemiesInRange) do
+            if not enemy:GetAttribute("IsBoat") then
+                local head = enemy:FindFirstChild("Head")
+                if head then
+                    table.insert(targets, { enemy, head })
+                    mainTarget = head
+                end
+            end
+        end
+        if mainTarget then
+            local storage = game:GetService("ReplicatedStorage")
+            local attackEvent = storage:WaitForChild("Modules"):WaitForChild("Net"):WaitForChild("RE/RegisterAttack")
+            local hitEvent = storage:WaitForChild("Modules"):WaitForChild("Net"):WaitForChild("RE/RegisterHit")
+            pcall(function()
+                attackEvent:FireServer(0.1)
+                hitEvent:FireServer(mainTarget, targets)
+            end)
+        end
+    end
+end
+
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 
 local Window = Fluent:CreateWindow({
-    Title = "SHIN X HUB-Blox Fruits    [ Free ] By Arcesury    ",
-    SubTitle = "",
+    Title = "Verania Hub-Blox Fruits    [ Free ] By Arcesury    ",
+    SubTitle = "Version Eng",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 300),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -2859,41 +2937,76 @@ local Window = Fluent:CreateWindow({
     MinimizeKey = Enum.KeyCode.LeftControl -- Used when theres no MinimizeKeybind
 })
 
-local Tabs = {
-    General = Window:AddTab({ Title = "General", Icon = "" }),
-    Settings = Window:AddTab({ Title = "Settings", Icon = "" })
-}
+General = Window:AddTab({ Title = "General", Icon = "" })
 
-local Options = Fluent.Options
-
-do
-
+Server = Window:AddTab({ Title = "Tab Status And Server", Icon = "" })
+Time = General:AddParagraph({
+    Title = "Time Zone",
+    Content = ""
+})
+function UpdateOS()
+    local date = os.date("*t")
+    local hour = (date.hour) % 24
+    local ampm = hour < 12 and "AM" or "PM"
+    local timezone = string.format("%02i:%02i:%02i %s", ((hour - 1) % 12) + 1, date.min, date.sec, ampm)
+    local datetime = string.format("%02d/%02d/%04d", date.day, date.month, date.year)    
+    local LocalizationService = game:GetService("LocalizationService")
+    local Players = game:GetService("Players")
+    local player = Players.LocalPlayer
+    local name = player.Name
+    local result, code    
+    if not getgenv().countryRegionCode then
+        result, code = pcall(function()
+            return LocalizationService:GetCountryRegionForPlayerAsync(player)
+        end)
+        if result then
+            getgenv().countryRegionCode = code
+        else
+            getgenv().countryRegionCode = "Unknown"
+        end
+    else
+        code = getgenv().countryRegionCode
+    end
+    Time:SetDesc(datetime.." - "..timezone.." [ " .. code .. " ]")
 end
+spawn(function()
+    while true do
+        UpdateOS()
+        wait(1)
+    end
+end)
+Timmessss = General:AddParagraph({
+    Title = "Time",
+    Content = ""
+})
+function UpdateTime()
+    local GameTime = math.floor(workspace.DistributedGameTime + 0.5)
+    local Hour = math.floor(GameTime / (60^2)) % 24
+    local Minute = math.floor(GameTime / (60^1)) % 60
+    local Second = math.floor(GameTime / (60^0)) % 60
+    Timmessss:SetDesc(Hour.." Hour (h) "..Minute.." Minute (m) "..Second.." Second (s) ")
+end
+spawn(function()
+    while true do
+        UpdateTime()
+        wait(1)
+    end
+end)
 
-    Fluent:Notify({
-        Title = "SHIN X HUB - Notification",
-        Content = "Beta Version",
-        SubContent = "Report Bug - Discord [ Soon ]", -- Optional
-        Duration = 5 -- Set to nil to make the notification not disappear
-    })
- 
-    Tabs.General:AddParagraph({
-        Title = "Normal Setup",
-        Content = ""
-    })
+General:AddParagraph({
+     Title = "Normal Setup",
+     Content = "-----"
+})
 
-    local Dropdown = Tabs.General:AddDropdown("Dropdown", {
-        Title = "Select Weapons",
-        Values = {"Melee", "Fruit", "Sword"},
-        Multi = false,
-        Default = 1,
-    })
-
-    Dropdown:SetValue("Kaliyunai")
-
-    Dropdown:OnChanged(function(Value)
-        _G.SelectWeapon = Value
-    end)
+Dropdown = General:AddDropdown("DropdownFarm", {
+    Title = "Select Weapon",
+    Values = {"Melee","Sword","Fruit"},
+    Multi = false,
+})
+Dropdown:SetValue("Melee")
+Dropdown:OnChanged(function(value)
+    _G.SelectWeapon = value
+end)
     task.spawn(function()
         while wait() do
 	    	pcall(function()
@@ -2934,20 +3047,36 @@ end
      	end
     end)
 
-    Tabs.General:AddParagraph({
-        Title = "Normal Farming",
-        Content = ""
-    })
+getgenv().FastAttack = false
+Toggle = General:AddToggle("Toggle", {Title = "Fast Attack", Description = "ตีเร็ว", Default = true })
+local FastAttackTask
+local function FastAttackLoop()
+    while getgenv().FastAttack do
+        if type(AttackNoCoolDown) == "function" then
+            AttackNoCoolDown()
+        end
+        task.wait(0.1)
+    end
+end
+Toggle:OnChanged(function(Value)
+    getgenv().FastAttack = Value
+    if Value and not FastAttackTask then
+        FastAttackTask = task.spawn(FastAttackLoop)
+    end
+    if not Value and FastAttackTask then
+        FastAttackTask = nil
+    end
+end)
 
-local Toggle = Tabs.General:AddToggle("MyToggle", {
-    Title = "Auto Farm Level",
-    Default = false
+General:AddParagraph({
+     Title = "Normal Farming",
+     Content = "-----"
 })
 
-Toggle:OnChanged(function(value)
-    _G.AutoFarm = value
-
-    if not value then
+Toggle = General:AddToggle("Toggle", {Title = "Auto Farm Level", Description = "ออโต้ ฟาร์ม เลเวล", Default = false })
+Toggle:OnChanged(function(Value)
+    _G.AutoFarm = Value
+    if not Value then
         if typeof(StopTween) == "function" then
             StopTween()
         else
@@ -3053,15 +3182,10 @@ end)
         end
     end)
 
-local Toggle = Tabs.General:AddToggle("MyToggle", {
-    Title = "Kill Aura",
-    Default = false
-})
-
-Toggle:OnChanged(function(value)
-    _G.AutoNear = value
-
-    if not value then
+Toggle = General:AddToggle("Toggle", {Title = "Kill Aura", Description = "ฆ่ารอบๆ", Default = false })
+Toggle:OnChanged(function(Value)
+    _G.AutoNear = Value
+    if not Value then
         if typeof(StopTween) == "function" then
             StopTween()
         else
@@ -3102,46 +3226,23 @@ end)
              end
           end)
 
-    Tabs.General:AddParagraph({
-        Title = "Mastery",
-        Content = ""
-    })
-    
-if World1 or World2 then
-    local dropdown1 = Tabs.General:AddDropdown("DropdownWorld1or2", {
-        Title = "Select Regime Farm",
-        Values = {"Farm Level", "Farm No Quest"},
-        Multi = false,
-        Default = 1,
-    })
-
-    dropdown1:OnChanged(function(Value)
-        _G.selectFruitFarm = Value
-    end)
-end
-
-if World3 then
-    local dropdown2 = Tabs.General:AddDropdown("DropdownWorld3", {
-        Title = "Select Regime Farm",
-        Values = {"Farm Level", "Farm No Quest", "Farm Cake", "Farm Bone"},
-        Multi = false,
-        Default = 1,
-    })
-
-    dropdown2:OnChanged(function(Value)
-        _G.selectFruitFarm = Value
-    end)
-end
-
-local Toggle = Tabs.General:AddToggle("MyToggle", {
-    Title = "Start Auto Farm Mastery Fruit",
-    Default = false
+StatusBone = General:AddParagraph({
+    Title = "Bone",
+    Content = ""
 })
-
-Toggle:OnChanged(function(value)
-    _G.AutoFarmFruits = value
-
-    if not value then
+    spawn(function()
+        while wait() do
+            pcall(function()
+                StatusBone:SetDesc("Your Have - คุณมี : "..(game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Bones","Check")))
+            end)
+        end
+    end)
+    
+Toggle = General:AddToggle("Toggle", {Title = "Auto Farm Bones", Description = "ออโต้ ฟาร์ม กระดูก", Default = false })
+Toggle:OnChanged(function(Value)
+game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AbandonQuest")
+    _G.FarmBone = Value
+    if not Value then
         if typeof(StopTween) == "function" then
             StopTween()
         else
@@ -3149,6 +3250,113 @@ Toggle:OnChanged(function(value)
         end
     end
 end)
+    spawn(function()
+        while wait() do 
+            local boneframe = CFrame.new(-9508.5673828125, 142.1398468017578, 5737.3603515625)
+            if _G.FarmBone and World3 then
+            pcall(function()
+                    if BypassTP then
+                        if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - boneframe.Position).Magnitude > 2000 then
+                            TP1(boneframe)
+                            wait(.1)
+                            for i = 1, 8 do
+                                game.Players.localPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(boneframe)
+			                    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("SetSpawnPoint")	
+                                wait(.1)		
+                            end
+                        elseif (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - boneframe.Position).Magnitude < 2000 then
+                            TP1(boneframe)
+                        end
+                    else
+                        TP1(boneframe)
+                    end
+                    if game:GetService("Workspace").Enemies:FindFirstChild("Reborn Skeleton") or game:GetService("Workspace").Enemies:FindFirstChild("Living Zombie") or game:GetService("Workspace").Enemies:FindFirstChild("Demonic Soul") or game:GetService("Workspace").Enemies:FindFirstChild("Posessed Mummy") then
+                        for i,v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
+                            if v.Name == "Reborn Skeleton" or v.Name == "Living Zombie" or v.Name == "Demonic Soul" or v.Name == "Posessed Mummy" then
+                                if v:FindFirstChild("Humanoid") and v:FindFirstChild("HumanoidRootPart") and v.Humanoid.Health > 0 then
+                                    repeat task.wait()
+                                        AutoHaki()
+                                        NoAttackAnimation = true
+                                        NeedAttacking = true
+                                        EquipWeapon(_G.SelectWeapon)
+                                        v.HumanoidRootPart.CanCollide = false
+                                        v.Humanoid.WalkSpeed = 0
+                                        v.Head.CanCollide = false 
+                                        StartBring = true
+                                        MonFarm = v.Name                
+                                        PosMon = v.HumanoidRootPart.CFrame
+                                        topos(v.HumanoidRootPart.CFrame * CFrame.new(0, 30, 0))
+                                        sethiddenproperty(game.Players.LocalPlayer,"SimulationRadius",math.huge)
+                                    until not _G.FarmBone or not v.Parent or v.Humanoid.Health <= 0
+                                end
+                            end
+                        end
+                    else
+                        StartBring = false
+    					topos(CFrame.new(-9506.234375, 172.130615234375, 6117.0771484375))
+                        for i,v in pairs(game:GetService("ReplicatedStorage"):GetChildren()) do 
+                            if v.Name == "Reborn Skeleton" then
+                                topos(v.HumanoidRootPart.CFrame * CFrame.new(2,20,2))
+                            elseif v.Name == "Living Zombie" then
+                                topos(v.HumanoidRootPart.CFrame * CFrame.new(2,20,2))
+                            elseif v.Name == "Demonic Soul" then
+                                topos(v.HumanoidRootPart.CFrame * CFrame.new(2,20,2))
+                            elseif v.Name == "Posessed Mummy" then
+                                topos(v.HumanoidRootPart.CFrame * CFrame.new(2,20,2))
+                            end
+                        end
+                    end
+                end)
+            end
+        end
+    end)     
+
+
+
+
+
+
+
+ILoveSui = General:AddParagraph({
+    Title = "Mastery",
+    Content = "มาสเตอร์รี่"
+})
+
+if World1 or World2 then
+Dropdown = General:AddDropdown("DropdownFarm", {
+    Title = "Select Regime Farm - เลือกโหมดฟาร์ม",
+    Values = {"Farm Level","Farm No Quest"},
+    Multi = false,
+})
+Dropdown:SetValue("Kaliyunai")
+Dropdown:OnChanged(function(value)
+    _G.selectFruitFarm = value
+end)
+end
+if World3 then
+Dropdown = General:AddDropdown("DropdownFarm", {
+    Title = "Select Regime Farm - เลือกโหมดฟาร์ม",
+    Values = {"Farm Level","Farm No Quest","Farm Cake","Farm Bone"},
+    Multi = false,
+})
+Dropdown:SetValue("Kaliyunai")
+Dropdown:OnChanged(function(value)
+    _G.selectFruitFarm = value
+end)
+end
+
+Toggle = General:AddToggle("Toggle", {Title = "Start Auto Farm Mastery Fruit", Description = "เริ่ม ออโต้ ฟาร์ม มาสเตอร์รี่ ผลไม้", Default = false })
+Toggle:OnChanged(function(Value)
+    _G.AutoFarmFruits = Value
+    if not Value then
+        if typeof(StopTween) == "function" then
+            StopTween()
+        else
+            warn("StopTween is not a valid function.")
+        end
+    end
+end)
+
 spawn(function()
     while task.wait() do
         if _G.UseSkill then
@@ -3379,20 +3587,15 @@ spawn(function()
     end
 end)
 
-    Tabs.General:AddParagraph({
-        Title = "Chest and Berry",
-        Content = ""
-    })
-
-local Toggle = Tabs.General:AddToggle("MyToggle", {
-    Title = "Auto Collect Chest",
-    Default = false
+ILoveSui = General:AddParagraph({
+    Title = "Chest and Berry",
+    Content = "กล่อง และ เบอร์รี่"
 })
 
-Toggle:OnChanged(function(value)
-    _G.FarmChest = value
-
-    if not value then
+Toggle = General:AddToggle("Toggle", {Title = "Auto Collect Chest", Description = "ออโต้ เก็บ กล่อง", Default = false })
+Toggle:OnChanged(function(Value)
+    _G.FarmChest = Value
+    if not Value then
         if typeof(StopTween) == "function" then
             StopTween()
         else
@@ -3400,6 +3603,7 @@ Toggle:OnChanged(function(value)
         end
     end
 end)
+
     spawn(function()
 	while wait() do
 		if _G.FarmChest then
@@ -3426,15 +3630,10 @@ end)
 	end
 end)
 
-local Toggle = Tabs.General:AddToggle("MyToggle", {
-    Title = "Auto Collect Berry",
-    Default = false
-})
-
-Toggle:OnChanged(function(value)
-    _G.CollectBerry = value
-
-    if not value then
+Toggle = General:AddToggle("Toggle", {Title = "Auto Collect Berry", Description = "ออโต้ เก็บ เบอร์รี่", Default = false })
+Toggle:OnChanged(function(Value)
+    _G.CollectBerry = Value
+    if not Value then
         if typeof(StopTween) == "function" then
             StopTween()
         else
@@ -3494,15 +3693,10 @@ spawn(function()
     end
 end)
 
-local Toggle = Tabs.General:AddToggle("MyToggle", {
-    Title = "Auto Start Auto Farm Berry Hop",
-    Default = false
-})
-
-Toggle:OnChanged(function(value)
-    _G.CollectBerryHop = value
-
-    if not value then
+Toggle = General:AddToggle("Toggle", {Title = "Auto Start Auto Farm Berry Hop", Description = "ออโต้ เริ่ม ออโต้ ฟาร์ม เบอร์รี่ ย้ายเซิฟเวอร์", Default = true })
+Toggle:OnChanged(function(Value)
+    _G.CollectBerryHop = Value
+    if not Value then
         if typeof(StopTween) == "function" then
             StopTween()
         else
@@ -3510,8 +3704,6 @@ Toggle:OnChanged(function(value)
         end
     end
 end)
-
-
 
 
 
