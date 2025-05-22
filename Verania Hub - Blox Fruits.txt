@@ -3068,9 +3068,22 @@ Toggle:OnChanged(function(Value)
     end
 end)
 
+_G.SpinPos
+Toggle = General:AddToggle("Toggle", {Title = "Spin Tween ", Description = "หมุน ทวีน", Default = false })
+Toggle:OnChanged(function(Value)
+    _G.SpinPos = Value
+    if not Value then
+        if typeof(StopTween) == "function" then
+            StopTween()
+        else
+            warn("StopTween is not a valid function.")
+        end
+    end
+end)
+
 General:AddParagraph({
      Title = "Normal Farming",
-     Content = "-----"
+     Content = "ฟาร์ม ทั่วไป"
 })
 
 Toggle = General:AddToggle("Toggle", {Title = "Auto Farm Level", Description = "ออโต้ ฟาร์ม เลเวล", Default = false })
@@ -3550,7 +3563,7 @@ end)
 
 ILoveSui = General:AddParagraph({
     Title = "Mastery",
-    Content = "มาสเตอร์รี่"
+    Content = "ความเชี่ยวชาญ"
 })
 
 if World1 or World2 then
@@ -3940,6 +3953,14 @@ General:AddParagraph({
      Title = "Boss",
      Content = "บอส"
 })
+
+General:AddButton({
+    Title = "Boss Status - สถานะ บอส",
+    Callback = function()
+        wait(0.2) local function checkBossStatus() local bossName = _G.SelectBoss if bossName and (game:GetService("ReplicatedStorage"):FindFirstChild(bossName) or game:GetService("Workspace").Enemies:FindFirstChild(bossName)) then return "Boss - บอส - 🟢" else return "Boss - บอส - ⚫" end end game.StarterGui:SetCore("SendNotification", {Title="Verania Hub"; Text=checkBossStatus(); Duration=5;})
+    end
+})
+
 if World1 then
     tableBoss = {
         "The Gorilla King", "Bobby", "Yeti", "Mob Leader", "Vice Admiral", 
@@ -3971,17 +3992,7 @@ De = General:AddParagraph({
     Title = "Boss - บอส",
     Content = ""
 })
-       spawn(function()
-    while wait() do
-        pcall(function()
-            if game:GetService("ReplicatedStorage"):FindFirstChild(_G.SelectBoss) or game:GetService("Workspace").Enemies:FindFirstChild(_G.SelectBoss) then
-                BossSpawn:Set("Status - Boss - สถานะบอส - 🟢")
-            else
-                De:SetDesc("Status - Boss - สถานะบอส - ⚫")
-               end
-            end)
-          end
-       end)
+
 
 Toggle = General:AddToggle("Toggle", {Title = "Auto Farm Boss", Description = "ออโต้ ฟาร์ม บอส", Default = false })
 Toggle:OnChanged(function(Value)
@@ -4024,6 +4035,7 @@ end)
         end
     end)     
 
+Sub = Window:AddTab({ Title = "Sub General", Icon = "" })
 
 
 
@@ -4031,6 +4043,193 @@ end)
 
 
 
+
+Set = Window:AddTab({ Title = "SetUp", Icon = "" })
+
+De = Set:AddParagraph({
+    Title = "Setup Farming - ตั้งค่า ฟาร์ม",
+    Content = ""
+})
+
+Toggle = Set:AddToggle("Toggle", {Title = "Bring Mob", Description = "ดึง มอบ", Default = true })
+Toggle:OnChanged(function(Value)
+    _G.BringMonster = Value
+    _G.BringMob = Value
+end)
+       spawn(function()
+    while task.wait() do
+        pcall(function()
+            CheckQuest()
+            if _G.BringMonster and StartBring and PosMon then
+                for i, v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
+                    local isValid = (v.Name == MonFarm or v.Name == Mon)
+                    local hasPart = v:FindFirstChild("Humanoid") and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Head")
+                    local isAlive = v.Humanoid and v.Humanoid.Health > 0
+                    local inRange = (v.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 350
+
+                    if isValid and hasPart and isAlive and inRange then
+                        local distToPosMon = (v.HumanoidRootPart.Position - PosMon.Position).Magnitude
+                        if distToPosMon <= 350 then
+                            -- Gôm quái
+                            v.HumanoidRootPart.CanCollide = false
+                            v.Head.CanCollide = false
+                            v.HumanoidRootPart.Size = Vector3.new(60, 60, 60)
+                            v.HumanoidRootPart.CFrame = PosMon
+
+                            -- Xoá Animator nếu có
+                            if v.Humanoid:FindFirstChild("Animator") then
+                                v.Humanoid.Animator:Destroy()
+                            end
+                        end
+                    end
+                end
+
+                -- Set SimulationRadius một lần
+                sethiddenproperty(game.Players.LocalPlayer, "SimulationRadius", math.huge)
+            end
+        end)
+    end
+end)
+
+
+spawn(function()
+    while wait() do
+        pcall(function()
+            for i, v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
+                if _G.BringMob and bringmob then
+                    if v.Name == MonFarm and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then
+                        if v.Name == "Factory Staff" then
+                            if (v.HumanoidRootPart.Position - FarmPos.Position).Magnitude <= 1000000000 then
+                                v.Head.CanCollide = false
+                                v.HumanoidRootPart.CanCollide = false
+                                v.HumanoidRootPart.Size = Vector3.new(60, 60, 60)
+                                v.HumanoidRootPart.CFrame = FarmPos
+                                if v.Humanoid:FindFirstChild("Animator") then
+                                    v.Humanoid.Animator:Destroy()
+                                end
+                                sethiddenproperty(game.Players.LocalPlayer, "SimulationRadius", math.huge)
+                            end
+                        elseif v.Name == MonFarm then
+                            if (v.HumanoidRootPart.Position - FarmPos.Position).Magnitude <= 10000000000 then
+                                v.HumanoidRootPart.CFrame = FarmPos
+                                v.HumanoidRootPart.Size = Vector3.new(60, 60, 60)
+                                v.HumanoidRootPart.Transparency = 1
+                                v.Humanoid.JumpPower = 0
+                                v.Humanoid.WalkSpeed = 0
+                                if v.Humanoid:FindFirstChild("Animator") then
+                                    v.Humanoid.Animator:Destroy()
+                                end
+                                v.HumanoidRootPart.CanCollide = false
+                                v.Head.CanCollide = false
+                                v.Humanoid:ChangeState(11)
+                                v.Humanoid:ChangeState(14)
+                                sethiddenproperty(game.Players.LocalPlayer, "SimulationRadius", math.huge)
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    end
+end)
+
+if not syn then isnetworkowner = function() return true end end
+getgenv().BringMobs = function(F, z)
+    PosMon = F
+    NameMon = z
+end
+
+task.spawn(function()
+    while task.wait() do
+        pcall(function()
+            if PosMon then
+                CheckQuest() 
+                for i,v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
+                    if syn then
+                        if v.Name == NameMon and v.Name ~= "Ice Admiral" and v.Name ~= "Don Swan" and v.Name ~= "Saber Expert" and v.Name ~= "Longma" and  v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 and (v.HumanoidRootPart.Position - game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position).magnitude <= 300 then
+                            if isnetworkowner(v.HumanoidRootPart) then
+                                v.HumanoidRootPart.CFrame = PosMon
+                                v.Humanoid.JumpPower = 0
+                                v.Humanoid.WalkSpeed = 0
+                                v.HumanoidRootPart.CanCollide = false
+                                v.HumanoidRootPart.Size = Vector3.new(2,2,2)
+                                if v.Humanoid:FindFirstChild("Animator") then
+                                    v.Humanoid.Animator:Destroy()
+                                end
+                                sethiddenproperty(game.Players.LocalPlayer, "SimulationRadius",  math.huge)
+                                v.Humanoid:ChangeState(11)
+                            end
+                        end
+                    else
+                        if v.Name == NameMon and v.Name ~= "Ice Admiral" and v.Name ~= "Don Swan" and v.Name ~= "Saber Expert" and v.Name ~= "Longma" and  v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 and (v.HumanoidRootPart.Position - game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position).magnitude <= 300 then
+                            v.HumanoidRootPart.CFrame = PosMon
+                            v.Humanoid.JumpPower = 0
+                            v.Humanoid.WalkSpeed = 0
+                            v.HumanoidRootPart.CanCollide = false
+                            v.HumanoidRootPart.Size = Vector3.new(2,2,2)
+                            if v.Humanoid:FindFirstChild("Animator") then
+                                v.Humanoid.Animator:Destroy()
+                            end
+                            sethiddenproperty(game.Players.LocalPlayer, "SimulationRadius",  math.huge)
+                            v.Humanoid:ChangeState(11)
+                        end
+                    end
+                end
+            end
+        end)
+    end
+end)
+PosY = 35            
+_G.AutoHaki = true
+     spawn(function()
+    while task.wait(0.1) do
+        if _G.AutoHaki then
+            pcall(AutoHaki)
+        end
+    end
+end)
+
+Slider = Set:AddSlider("Slider", {
+    Title = "High Tween - ทวีน สูง",
+    Default = 30,
+    Min = 0,
+    Max = 50,
+    Rounding = 5,
+    Callback = function(Value)
+        PosY = Value
+    end
+})
+
+
+
+De = Set:AddParagraph({
+    Title = "Setup Mastery - การตั้งค่า ความเชี่ยวชาญ",
+    Content = ""
+})
+
+Slider = Set:AddSlider("Slider", {
+    Title = "Select Healt Mob Farm - เลือก เลือด มอบ",
+    Default = 30,
+    Min = 0,
+    Max = 100,
+    Rounding = 5,
+    Callback = function(Value)
+        KillPercent = Value
+    end
+})
+
+Toggle = Set:AddToggle("Toggle", {Title = "Use Skills XZCV", Description = "ใช้ สกิล XZCV", Default = true })
+Toggle:OnChanged(function(Value)
+    SkillZ = Value
+    SkillX = Value
+    SkillC = Value
+    SkillV = Value
+end)
+
+Toggle = Set:AddToggle("Toggle", {Title = "Use Skill F", Description = "ใช้สกิล F", Default = false })
+Toggle:OnChanged(function(Value)
+    SkillC = Value
+end)
 
 
 
