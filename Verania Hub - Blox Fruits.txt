@@ -4090,14 +4090,6 @@ Slider = Set:AddSlider("Slider", {
     end
 })
 
-Toggle = Set:AddToggle("Toggle", {Title = "Use Skills XZCV", Description = "ใช้ สกิล XZCV", Default = true })
-Toggle:OnChanged(function(Value)
-    SkillZ = Value
-    SkillX = Value
-    SkillC = Value
-    SkillV = Value
-end)
-
 Toggle = Set:AddToggle("Toggle", {Title = "Use Skill F", Description = "ใช้สกิล F", Default = false })
 Toggle:OnChanged(function(Value)
     SkillC = Value
